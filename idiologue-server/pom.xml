@@ -13,6 +13,7 @@
 
     <properties>
         <spring.boot.version>3.2.6</spring.boot.version>
+        <spring.hateoas.version>2.3.0</spring.hateoas.version>
 
         <janusgraph.version>1.0.0-20231016-190430.26ed54f</janusgraph.version>
         <tinkerpop.version>3.7.2</tinkerpop.version>
@@ -33,6 +34,12 @@
                     <artifactId>log4j-to-slf4j</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.hateoas</groupId>
+            <artifactId>spring-hateoas</artifactId>
+            <version>${spring.hateoas.version}</version>
         </dependency>
 
         <dependency>
