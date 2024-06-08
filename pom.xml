@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>idiologue-server</module>
+        <module>idiologue-api</module>
     </modules>
 
     <properties>
