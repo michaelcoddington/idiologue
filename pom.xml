@@ -9,12 +9,13 @@
     <modules>
         <module>idiologue-server</module>
         <module>idiologue-api</module>
+        <module>logging-dependencies</module>
     </modules>
 
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <spring.boot.version>3.2.6</spring.boot.version>
     </properties>
 
     <build>
