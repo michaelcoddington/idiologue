@@ -30,8 +30,9 @@ public class EntityController {
     @GetMapping("/{id}")
     Map<String, Object> getEntity(@PathVariable("id") Long id) {
         Map<String, Object> projection = g.V(id).
-                project("id", "properties")
+                project("id", "type", "properties")
                 .by(__.id())
+                .by(__.label())
                 .by(__.valueMap())
                 .next();
 
@@ -41,8 +42,9 @@ public class EntityController {
     @GetMapping
     Flux<Map<String, Object>> getEntities() {
         Iterator<Map<String, Object>> projectionIterator = g.V().
-                project("id", "properties")
+                project("id", "type", "properties")
                 .by(__.id())
+                .by(__.label())
                 .by(__.valueMap());
 
         return Flux.fromIterable(() -> projectionIterator);

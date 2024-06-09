@@ -1,0 +1,19 @@
+Configuration:
+  name: Default
+  shutdownHook: disable
+
+  Appenders:
+    Console:
+      name: Console_Appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS}{America/New_York} %highlight{%-5level}{FATAL=red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue} [%t] %X %C{1}.%M(%F:%L) - %msg%n"
+
+  loggers:
+    root:
+      level: INFO
+      appenderRef:
+        - ref: Console_Appender
+    logger:
+      - name: org.idiologue
+        level: DEBUG

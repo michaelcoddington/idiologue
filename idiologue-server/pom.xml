@@ -15,11 +15,15 @@
         <spring.boot.version>3.2.6</spring.boot.version>
         <spring.hateoas.version>2.3.0</spring.hateoas.version>
 
+        <apache.tika.version>2.9.2</apache.tika.version>
         <janusgraph.version>1.0.0-20231016-190430.26ed54f</janusgraph.version>
         <tinkerpop.version>3.7.2</tinkerpop.version>
+
     </properties>
 
     <dependencies>
+
+        <!-- Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
@@ -41,6 +45,14 @@
             <artifactId>spring-hateoas</artifactId>
             <version>${spring.hateoas.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+
+        <!-- Idiologue -->
 
         <dependency>
             <groupId>org.idiologue</groupId>
@@ -75,6 +87,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- Tika for image metadata extraction -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${apache.tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers-standard-package</artifactId>
+            <version>${apache.tika.version}</version>
+        </dependency>
+
 
     </dependencies>
 
