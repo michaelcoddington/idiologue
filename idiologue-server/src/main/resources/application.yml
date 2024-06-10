@@ -1,2 +1,7 @@
 logging:
   config: classpath:log4j2.yaml
+
+spring:
+  servlet:
+    multipart:
+      resolve-lazily: true

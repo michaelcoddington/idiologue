@@ -1,6 +1,6 @@
 package org.idiologue.server.config;
 
-import org.idiologue.server.security.BearerTokenAuthorizationManager;
+import org.idiologue.server.security.DefaultSecurityContextRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +13,15 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class WebSecurityConfiguration {
 
     @Autowired
-    private BearerTokenAuthorizationManager tokenAuthorizationManager;
+    private DefaultSecurityContextRepository contextRepository;
 
     @Bean
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(auth -> auth.anyExchange().access(tokenAuthorizationManager))
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .securityContextRepository(contextRepository)
+                .authorizeExchange(auth -> auth.anyExchange().authenticated())
                 .build();
     }
 
