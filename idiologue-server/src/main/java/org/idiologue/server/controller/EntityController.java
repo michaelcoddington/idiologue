@@ -10,6 +10,7 @@ import org.idiologue.api.Entity;
 import org.idiologue.api.Metadata;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -83,30 +84,30 @@ public class EntityController {
 
     @PutMapping("/upload")
     Mono<Void> testUpload(ServerWebExchange exchange) {
-        LOG.info("Upload?");
+        ServerHttpRequest request = exchange.getRequest();
+        String contentType = request.getHeaders().getFirst("Content-Type");
+        LOG.info("Uploading content type {}", contentType);
         // this is kinda ok, in that it writes a complete file, but unfortunately it also includes the multipart
-        Flux<DataBuffer> buffer = exchange.getRequest().getBody();
+        Flux<DataBuffer> buffer = request.getBody();
         File outfile = new File("/tmp/test.dat");
-        FileOutputStream fos = null;
         try {
             LOG.info("Writing data");
-            fos = new FileOutputStream(outfile);
+            FileOutputStream fos = new FileOutputStream(outfile);
             Flux<DataBuffer> bufferFlux = DataBufferUtils.write(buffer, fos);
             Flux<Boolean> closeFlux = bufferFlux.map(DataBufferUtils::release);
-            Mono<Void> retMono = closeFlux.then();
-            return retMono;
+            return closeFlux.then(Mono.fromRunnable(() -> {
+                if (fos != null) {
+                    try {
+                        fos.flush();
+                        fos.close();
+                    } catch (IOException ioe2) {
+                        LOG.error(ioe2);
+                    }
+                }
+            }));
         } catch (IOException ioe) {
             LOG.error(ioe);
             throw new RuntimeException(ioe);
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.flush();
-                    fos.close();
-                } catch (IOException ioe2) {
-                    LOG.error(ioe2);
-                }
-            }
         }
     }
 
