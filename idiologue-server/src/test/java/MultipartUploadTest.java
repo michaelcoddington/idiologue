@@ -3,6 +3,7 @@ import com.google.common.collect.Iterables;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.HttpHeaders;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,6 +15,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class MultipartUploadTest {
 
     public static void main(String[] args) {
+
         String boundary = "----------------------------618397665255609563106496";
 
         String sampleData = """
@@ -41,6 +43,14 @@ public class MultipartUploadTest {
         DataBufferFactory factory = new DefaultDataBufferFactory();
         Flux<DataBuffer> stream = Flux.fromArray(strings).map(s -> factory.wrap(s.getBytes(UTF_8)));
 
+
+        // so ok, we can read databuffers without needing to use bytebuffers all the time
+        DataBuffer testBuffer = factory.wrap(new String("Ok maybe this works").getBytes(UTF_8));
+        System.out.println(testBuffer.readableByteCount());
+        testBuffer.getByte(0);
+        System.out.println(testBuffer.readableByteCount());
+
+
         /*
          * As we iterate through the buffers, we want to:
          * 1. Skip over a boundary
@@ -52,8 +62,24 @@ public class MultipartUploadTest {
          *
          */
 
+        MultipartParserListener listener = new MultipartParserListener() {
+            @Override
+            public void partStarted(HttpHeaders headers) {
+                System.out.println("Part started with headeres " + headers);
+            }
 
-        MultipartParser parser = new MultipartParser(boundary);
+            @Override
+            public void bodyBytesRead(byte[] bytes) {
+                System.out.println("Got body bytes " + new String(bytes));
+            }
+
+            @Override
+            public void partEnded() {
+                System.out.println("Part ended");
+            }
+        };
+
+        MultipartParser parser = new MultipartParser(boundary, listener);
         System.out.println("start");
         Mono<Void> ret = parser.parse(stream);
         ret.subscribe();

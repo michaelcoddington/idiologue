@@ -1,8 +1,13 @@
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -31,10 +36,15 @@ public class MultipartParser {
 
     private ByteBufferSequenceMatcher matcher = new ByteBufferSequenceMatcher();
 
-    public MultipartParser(String boundary) {
+    private MultipartParserListener listener;
+
+    private Pattern headerPattern = Pattern.compile("([^:]+): (.+)");
+
+    public MultipartParser(String boundary, MultipartParserListener listener) {
         this.boundary = boundary;
         this.initialBoundaryBytes = boundary.getBytes(UTF_8);
         this.subsequentBoundaryBytes = ("\n" + boundary).getBytes(UTF_8);
+        this.listener = listener;
     }
 
     Mono<Void> parse(Flux<DataBuffer> bufferFlux) {
@@ -89,7 +99,18 @@ public class MultipartParser {
                 byteBuffer.get(headerBytes, 0, headerEndPosition);
                 byteBuffer.compact();
                 bufferSize -= headerEndPosition;
-                System.out.println(new String(headerBytes));
+                String headerString = new String(headerBytes).trim();
+                List<String> lines = Arrays.stream(headerString.split("\n")).toList();
+                HttpHeaders headers = new HttpHeaders();
+                lines.forEach(line ->{
+                    Matcher m = headerPattern.matcher(line);
+                    if (m.matches()) {
+                        String headerName = m.group(1);
+                        String headerValue = m.group(2);
+                        headers.set(headerName, headerValue);
+                    }
+                });
+                listener.partStarted(headers);
                 this.currentState = State.COLLECTING_BODY;
             }
         } else if (currentState.equals(State.COLLECTING_BODY)) {
@@ -103,11 +124,12 @@ public class MultipartParser {
                 byteBuffer.position(0);
                 byte[] bodyBytes = new byte[completeMatch.startPosition];
                 byteBuffer.get(bodyBytes, 0, bodyBytes.length);
-                System.out.println(new String(bodyBytes));
+                listener.bodyBytesRead(bodyBytes);
                 // at this point we've stopped just before the newline, so read that...
                 byteBuffer.get();
                 // and compact
                 byteBuffer.compact();
+                listener.partEnded();
                 this.currentState = State.SEEKING_INITIAL_BOUNDARY;
             }
         }

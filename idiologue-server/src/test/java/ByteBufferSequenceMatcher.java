@@ -29,7 +29,7 @@ public class ByteBufferSequenceMatcher {
         byte start = testSequence[0];
         for (int i = bufferStartPosition; i < bufferReadLimit; i++) {
             if (buffer.get(i) == start) {
-                System.out.println("Match on sequence start, buffer index " + i);
+                //System.out.println("Match on sequence start, buffer index " + i);
                 int matchCount = 1; // we already found the first byte
                 boolean mismatch = false;
                 int followPosition = 1;
