@@ -9,7 +9,6 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.idiologue.api.Entity;
 import org.idiologue.api.Metadata;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +25,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/v1/entity")
 public class EntityController {
 
     private static final Logger LOG = LogManager.getLogger(EntityController.class);
+
+    private Pattern boundaryPattern = Pattern.compile("multipart/form-data; boundary=(.+)");
 
     private GraphTraversalSource g;
 
@@ -87,14 +89,22 @@ public class EntityController {
         ServerHttpRequest request = exchange.getRequest();
         String contentType = request.getHeaders().getFirst("Content-Type");
         LOG.info("Uploading content type {}", contentType);
-        // this is kinda ok, in that it writes a complete file, but unfortunately it also includes the multipart
-        Flux<DataBuffer> buffer = request.getBody();
+
+        Flux<DataBuffer> bufferFlux = request.getBody();
+
         File outfile = new File("/tmp/test.dat");
         try {
             LOG.info("Writing data");
             FileOutputStream fos = new FileOutputStream(outfile);
-            Flux<DataBuffer> bufferFlux = DataBufferUtils.write(buffer, fos);
-            Flux<Boolean> closeFlux = bufferFlux.map(DataBufferUtils::release);
+            Flux<Boolean> closeFlux = bufferFlux.mapNotNull(buffer -> {
+                try {
+                    buffer.asInputStream().transferTo(fos);
+                    fos.flush();
+                } catch (IOException eeee) {
+
+                }
+                return null;
+            });
             return closeFlux.then(Mono.fromRunnable(() -> {
                 if (fos != null) {
                     try {
@@ -109,6 +119,58 @@ public class EntityController {
             LOG.error(ioe);
             throw new RuntimeException(ioe);
         }
+
+        /*
+        Matcher boundaryMatcher = boundaryPattern.matcher(contentType);
+        if (boundaryMatcher.matches()) {
+            String boundary = boundaryMatcher.group(1);
+            MultipartParserListener listener = new MultipartParserListener() {
+                private FileOutputStream fos = null;
+
+                @Override
+                public void partStarted(HttpHeaders headers) {
+                    try {
+                        File file = new File("/tmp/out-" + UUID.randomUUID().toString() + ".dat");
+                        fos = new FileOutputStream(file);
+                        LOG.info("Created temp file {} with headers {}", file.getAbsolutePath(), headers);
+                    } catch (IOException ioe) {
+                        LOG.error(ioe);
+                    }
+                }
+
+                @Override
+                public void bodyBytesRead(byte[] bytes) {
+                    if (fos != null) {
+                        try {
+                            fos.write(bytes);
+                            LOG.info("Wrote {} bytes", bytes.length);
+                        } catch (Exception er) {
+                            LOG.error(er);
+                        }
+                    }
+                }
+
+                @Override
+                public void partEnded() {
+                    if (fos != null) {
+                        try {
+                            fos.flush();
+                            fos.close();
+                            LOG.info("File closed");
+                        } catch (IOException ioe) {
+                            LOG.error(ioe);
+                        }
+                    }
+                }
+            };
+            MultipartParser parser = new MultipartParser(boundary, listener);
+            return parser.parse(bufferFlux);
+        } else {
+            LOG.error("No boundary found in content type {}", contentType);
+            return Mono.empty();
+        }
+
+         */
     }
 
 }

@@ -1,3 +1,5 @@
+package org.idiologue.server.controller;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -65,7 +67,7 @@ public class MultipartUploadTest {
         MultipartParserListener listener = new MultipartParserListener() {
             @Override
             public void partStarted(HttpHeaders headers) {
-                System.out.println("Part started with headeres " + headers);
+                System.out.println("Part started with headers " + headers);
             }
 
             @Override

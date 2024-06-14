@@ -1,3 +1,5 @@
+package org.idiologue.server.controller;
+
 import org.springframework.http.HttpHeaders;
 
 public interface MultipartParserListener {

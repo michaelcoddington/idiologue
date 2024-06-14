@@ -1,9 +1,13 @@
+package org.idiologue.server.controller;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,28 +26,24 @@ public class MultipartParser {
 
     private State currentState = State.SEEKING_INITIAL_BOUNDARY;
 
-    private String boundary;
-
     private byte[] initialBoundaryBytes;
 
     private byte[] subsequentBoundaryBytes;
 
     private static final byte[] DOUBLE_NEWLINE_BYTES = new byte[] { 10, 10 };
 
-    private ByteBuffer byteBuffer = ByteBuffer.allocate(4000);
-
-    private int bufferSize = 0;
-
-    private ByteBufferSequenceMatcher matcher = new ByteBufferSequenceMatcher();
+    private ArrayBuffer buffer = new ArrayBuffer(64000);
 
     private MultipartParserListener listener;
 
     private Pattern headerPattern = Pattern.compile("([^:]+): (.+)");
 
+    private static final Logger LOG = LogManager.getLogger(MultipartParser.class);
+
     public MultipartParser(String boundary, MultipartParserListener listener) {
-        this.boundary = boundary;
-        this.initialBoundaryBytes = boundary.getBytes(UTF_8);
-        this.subsequentBoundaryBytes = ("\n" + boundary).getBytes(UTF_8);
+        LOG.info("Created multipart parser with boundary {}", boundary);
+        this.initialBoundaryBytes = ("--" + boundary).getBytes(UTF_8);
+        this.subsequentBoundaryBytes = ("\n--" + boundary).getBytes(UTF_8);
         this.listener = listener;
     }
 
@@ -61,48 +61,51 @@ public class MultipartParser {
     private void process(DataBuffer dataBuffer) {
         int byteCount = dataBuffer.readableByteCount();
         System.out.println("Data buffer is adding " + byteCount + " bytes");
-        dataBuffer.toByteBuffer(0, byteBuffer, bufferSize, byteCount);
-        bufferSize += byteCount;
+        buffer.write(dataBuffer);
+        DataBufferUtils.release(dataBuffer);
+        processBuffer();
+    }
+
+    private void processBuffer() {
+        boolean continuationDesired = false;
+        LOG.info("Processing with current state {}", currentState);
 
         if (currentState.equals(State.SEEKING_INITIAL_BOUNDARY)) {
-            ByteBufferSequenceMatcher.MatchResult result = matcher.match(byteBuffer, 0, bufferSize, initialBoundaryBytes);
+            ArrayBuffer.MatchResult result = buffer.match(0, initialBoundaryBytes);
 
-            if (result instanceof ByteBufferSequenceMatcher.NoMatchResult noMatch) {
+            if (result instanceof ArrayBuffer.NoMatchResult noMatch) {
                 System.out.println("No match :(");
-            } else if (result instanceof ByteBufferSequenceMatcher.PartialMatchResult partialMatch) {
+            } else if (result instanceof ArrayBuffer.PartialMatchResult partialMatch) {
                 System.out.println("Partial match: " + result);
-            } else if (result instanceof ByteBufferSequenceMatcher.CompleteMatchResult completeMatch) {
+            } else if (result instanceof ArrayBuffer.CompleteMatchResult completeMatch) {
                 System.out.println("Complete boundary match: " + result);
                 if (completeMatch.startPosition == 0) {
                     // end position is the position of the last boundary character, so we add 1 to position past the
                     // boundary and then 1 more to position past the newline that follows
-                    int newStartPosition = completeMatch.endPosition - completeMatch.startPosition + 2;
+                    int skipCount = completeMatch.endPosition + 2;
 
                     // remove the boundary from the buffer
-                    byteBuffer.position(newStartPosition);
-                    byteBuffer.compact();
-                    bufferSize -= newStartPosition;
+                    buffer.skip(skipCount);
 
                     this.currentState = State.GATHERING_PART_HEADERS;
                     System.out.println("Dropped boundary");
+                    continuationDesired = true;
                 } else {
                     throw new RuntimeException("Malformed boundary! " + completeMatch);
                 }
             }
         } else if (currentState.equals(State.GATHERING_PART_HEADERS)) {
-            ByteBufferSequenceMatcher.MatchResult result = matcher.match(byteBuffer, 0, bufferSize, DOUBLE_NEWLINE_BYTES);
-            if (result instanceof ByteBufferSequenceMatcher.CompleteMatchResult completeMatch) {
+            ArrayBuffer.MatchResult result = buffer.match(0, DOUBLE_NEWLINE_BYTES);
+            if (result instanceof ArrayBuffer.CompleteMatchResult completeMatch) {
                 System.out.println("Complete header match " + completeMatch);
-                byteBuffer.position(0);
-                int headerEndPosition = completeMatch.endPosition + 1;
-                byte[] headerBytes = new byte[headerEndPosition];
-                byteBuffer.get(headerBytes, 0, headerEndPosition);
-                byteBuffer.compact();
-                bufferSize -= headerEndPosition;
+
+                int count = completeMatch.endPosition + 1;
+                byte[] headerBytes = new byte[count];
+                buffer.read(headerBytes);
                 String headerString = new String(headerBytes).trim();
                 List<String> lines = Arrays.stream(headerString.split("\n")).toList();
                 HttpHeaders headers = new HttpHeaders();
-                lines.forEach(line ->{
+                lines.forEach(line -> {
                     Matcher m = headerPattern.matcher(line);
                     if (m.matches()) {
                         String headerName = m.group(1);
@@ -112,26 +115,30 @@ public class MultipartParser {
                 });
                 listener.partStarted(headers);
                 this.currentState = State.COLLECTING_BODY;
+                continuationDesired = true;
             }
         } else if (currentState.equals(State.COLLECTING_BODY)) {
-            ByteBufferSequenceMatcher.MatchResult result = matcher.match(byteBuffer, 0, bufferSize, subsequentBoundaryBytes);
-            if (result instanceof ByteBufferSequenceMatcher.NoMatchResult noMatch) {
-                System.out.println("No match :(");
-            } else if (result instanceof ByteBufferSequenceMatcher.PartialMatchResult partialMatch) {
-                System.out.println("Partial match: " + result);
-            } else if (result instanceof ByteBufferSequenceMatcher.CompleteMatchResult completeMatch) {
-                System.out.println("Complete body match " + completeMatch);
-                byteBuffer.position(0);
-                byte[] bodyBytes = new byte[completeMatch.startPosition];
-                byteBuffer.get(bodyBytes, 0, bodyBytes.length);
+            ArrayBuffer.MatchResult result = buffer.match(0, subsequentBoundaryBytes);
+            if (result instanceof ArrayBuffer.NoMatchResult noMatch) {
+                System.out.println("No match :( " + buffer.available());
+                byte[] bodyBytes = new byte[buffer.available()];
+                buffer.read(bodyBytes);
                 listener.bodyBytesRead(bodyBytes);
-                // at this point we've stopped just before the newline, so read that...
-                byteBuffer.get();
-                // and compact
-                byteBuffer.compact();
+            } else if (result instanceof ArrayBuffer.PartialMatchResult partialMatch) {
+                System.out.println("Partial match: " + result);
+            } else if (result instanceof ArrayBuffer.CompleteMatchResult completeMatch) {
+                System.out.println("Complete body match " + completeMatch);
+                byte[] bodyBytes = new byte[completeMatch.startPosition];
+                buffer.read(bodyBytes);
+                listener.bodyBytesRead(bodyBytes);
+                buffer.skip(1);
                 listener.partEnded();
                 this.currentState = State.SEEKING_INITIAL_BOUNDARY;
+                continuationDesired = true;
             }
+        }
+        if (continuationDesired) {
+            processBuffer();
         }
     }
 

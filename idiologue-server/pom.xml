@@ -19,6 +19,7 @@
         <janusgraph.version>1.0.0-20231016-190430.26ed54f</janusgraph.version>
         <tinkerpop.version>3.7.2</tinkerpop.version>
 
+        <junit.version>5.8.2</junit.version>
     </properties>
 
     <dependencies>
@@ -98,6 +99,14 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers-standard-package</artifactId>
             <version>${apache.tika.version}</version>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
 
 
