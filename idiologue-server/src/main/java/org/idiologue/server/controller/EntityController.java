@@ -9,6 +9,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.idiologue.api.Entity;
 import org.idiologue.api.Metadata;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
@@ -92,6 +95,7 @@ public class EntityController {
 
         Flux<DataBuffer> bufferFlux = request.getBody();
 
+        /*
         File outfile = new File("/tmp/test.dat");
         try {
             LOG.info("Writing data");
@@ -119,8 +123,10 @@ public class EntityController {
             LOG.error(ioe);
             throw new RuntimeException(ioe);
         }
+        */
 
-        /*
+
+
         Matcher boundaryMatcher = boundaryPattern.matcher(contentType);
         if (boundaryMatcher.matches()) {
             String boundary = boundaryMatcher.group(1);
@@ -162,6 +168,11 @@ public class EntityController {
                         }
                     }
                 }
+
+                @Override
+                public void parseEnded() {
+                    LOG.info("Parse ended");
+                }
             };
             MultipartParser parser = new MultipartParser(boundary, listener);
             return parser.parse(bufferFlux);
@@ -170,7 +181,7 @@ public class EntityController {
             return Mono.empty();
         }
 
-         */
+
     }
 
 }

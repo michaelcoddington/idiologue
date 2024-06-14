@@ -9,4 +9,6 @@ public interface MultipartParserListener {
 
     void partEnded();
 
+    void parseEnded();
+
 }

@@ -61,6 +61,15 @@ public class ArrayBuffer {
         }
     }
 
+    public byte peek(int index) {
+        int effectiveIndex = readPosition + index;
+        if (effectiveIndex < writePosition) {
+            return array[effectiveIndex];
+        } else {
+            throw new IllegalArgumentException("Cannot peek at or beyond write position " + writePosition + " using index " + effectiveIndex);
+        }
+    }
+
     public void read(byte[] target) {
         // read the next available bytes into the target
         int byteReadCount = Math.min(writePosition - readPosition, target.length);
