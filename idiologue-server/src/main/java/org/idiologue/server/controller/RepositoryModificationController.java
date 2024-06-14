@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/repository")
+@RequestMapping("/api/v1/repository")
 public class RepositoryModificationController {
 
     private static final Logger LOG = LogManager.getLogger(RepositoryModificationController.class);

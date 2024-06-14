@@ -31,7 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
-@RequestMapping("/v1/entity")
+@RequestMapping("/api/v1/entity")
 public class EntityController {
 
     private static final Logger LOG = LogManager.getLogger(EntityController.class);
