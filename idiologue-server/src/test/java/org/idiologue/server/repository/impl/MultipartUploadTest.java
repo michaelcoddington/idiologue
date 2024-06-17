@@ -2,8 +2,6 @@ package org.idiologue.server.repository.impl;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import org.idiologue.server.repository.impl.MultipartParser;
-import org.idiologue.server.repository.impl.MultipartParserListener;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
@@ -80,6 +78,11 @@ public class MultipartUploadTest {
             @Override
             public void partEnded() {
                 System.out.println("Part ended");
+            }
+
+            @Override
+            public void parseEnded() {
+                System.out.println("Parse ended");
             }
         };
 
