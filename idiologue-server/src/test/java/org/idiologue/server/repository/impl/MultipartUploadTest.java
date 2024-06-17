@@ -1,4 +1,4 @@
-package org.idiologue.server.controller;
+package org.idiologue.server.repository.impl;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;

@@ -1,4 +1,4 @@
-package org.idiologue.server.controller;
+package org.idiologue.server.repository.impl;
 
 import org.idiologue.server.repository.impl.ArrayBuffer;
 import org.junit.jupiter.api.DisplayName;
