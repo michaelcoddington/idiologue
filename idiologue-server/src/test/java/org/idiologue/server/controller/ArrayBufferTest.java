@@ -1,5 +1,6 @@
 package org.idiologue.server.controller;
 
+import org.idiologue.server.repository.impl.ArrayBuffer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.buffer.DataBuffer;

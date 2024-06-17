@@ -1,4 +1,4 @@
-package org.idiologue.server.controller;
+package org.idiologue.server.repository.impl;
 
 import org.springframework.http.HttpHeaders;
 

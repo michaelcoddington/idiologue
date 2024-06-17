@@ -8,8 +8,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.idiologue.api.Entity;
 import org.idiologue.api.Metadata;
+import org.idiologue.server.repository.BinaryStorageRepository;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,12 +21,9 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,10 +35,13 @@ public class EntityController {
 
     private Pattern boundaryPattern = Pattern.compile("multipart/form-data; boundary=(.+)");
 
+    BinaryStorageRepository binaryStorageRepository;
+
     private GraphTraversalSource g;
 
-    public EntityController(GraphTraversalSource traversalSource) {
+    public EntityController(GraphTraversalSource traversalSource, BinaryStorageRepository binaryStorageRepository) {
         this.g = traversalSource;
+        this.binaryStorageRepository = binaryStorageRepository;
     }
 
     @GetMapping("/{id}")
@@ -88,12 +88,22 @@ public class EntityController {
     }
 
     @PutMapping("/upload")
-    Mono<Void> testUpload(ServerWebExchange exchange) {
+    Mono<Void> testUpload(ServerWebExchange exchange) throws NoSuchAlgorithmException {
         ServerHttpRequest request = exchange.getRequest();
         String contentType = request.getHeaders().getFirst("Content-Type");
         LOG.info("Uploading content type {}", contentType);
 
         Flux<DataBuffer> bufferFlux = request.getBody();
+
+
+
+        Matcher boundaryMatcher = boundaryPattern.matcher(contentType);
+        if (boundaryMatcher.matches()) {
+            String boundary = boundaryMatcher.group(1);
+            return binaryStorageRepository.store(boundary, bufferFlux);
+        } else {
+            return Mono.empty();
+        }
 
         /*
         File outfile = new File("/tmp/test.dat");
@@ -124,62 +134,6 @@ public class EntityController {
             throw new RuntimeException(ioe);
         }
         */
-
-
-
-        Matcher boundaryMatcher = boundaryPattern.matcher(contentType);
-        if (boundaryMatcher.matches()) {
-            String boundary = boundaryMatcher.group(1);
-            MultipartParserListener listener = new MultipartParserListener() {
-                private FileOutputStream fos = null;
-
-                @Override
-                public void partStarted(HttpHeaders headers) {
-                    try {
-                        File file = new File("/tmp/out-" + UUID.randomUUID().toString() + ".dat");
-                        fos = new FileOutputStream(file);
-                        LOG.info("Created temp file {} with headers {}", file.getAbsolutePath(), headers);
-                    } catch (IOException ioe) {
-                        LOG.error(ioe);
-                    }
-                }
-
-                @Override
-                public void bodyBytesRead(byte[] bytes) {
-                    if (fos != null) {
-                        try {
-                            fos.write(bytes);
-                            LOG.info("Wrote {} bytes", bytes.length);
-                        } catch (Exception er) {
-                            LOG.error(er);
-                        }
-                    }
-                }
-
-                @Override
-                public void partEnded() {
-                    if (fos != null) {
-                        try {
-                            fos.flush();
-                            fos.close();
-                            LOG.info("File closed");
-                        } catch (IOException ioe) {
-                            LOG.error(ioe);
-                        }
-                    }
-                }
-
-                @Override
-                public void parseEnded() {
-                    LOG.info("Parse ended");
-                }
-            };
-            MultipartParser parser = new MultipartParser(boundary, listener);
-            return parser.parse(bufferFlux);
-        } else {
-            LOG.error("No boundary found in content type {}", contentType);
-            return Mono.empty();
-        }
 
 
     }
