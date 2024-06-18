@@ -1,4 +1,4 @@
-package org.idiologue.server.repository.impl;
+package org.idiologue.server.repository.binary;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,4 +1,4 @@
-package org.idiologue.server.repository.impl;
+package org.idiologue.server.repository.binary;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,7 +51,7 @@ public class MultipartParser {
         this.listener = listener;
     }
 
-    Mono<Void> parse(Flux<DataBuffer> bufferFlux) {
+    public Mono<Void> parse(Flux<DataBuffer> bufferFlux) {
         return bufferFlux.mapNotNull(dataBuffer -> {
             try {
                 process(dataBuffer);

@@ -1,4 +1,4 @@
-package org.idiologue.server.security;
+package org.idiologue.server.config.security;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

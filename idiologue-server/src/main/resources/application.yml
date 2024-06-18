@@ -5,3 +5,8 @@ spring:
   servlet:
     multipart:
       resolve-lazily: true
+
+binary:
+  storage:
+    strategy: block
+    block.location: /tmp

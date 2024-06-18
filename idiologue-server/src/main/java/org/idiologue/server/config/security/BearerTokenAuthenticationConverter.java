@@ -1,4 +1,4 @@
-package org.idiologue.server.security;
+package org.idiologue.server.config.security;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

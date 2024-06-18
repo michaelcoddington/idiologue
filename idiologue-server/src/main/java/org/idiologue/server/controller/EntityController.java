@@ -8,7 +8,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.idiologue.api.Entity;
 import org.idiologue.api.Metadata;
-import org.idiologue.server.repository.BinaryStorageRepository;
+import org.idiologue.server.repository.binary.BinaryStorageRepository;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;

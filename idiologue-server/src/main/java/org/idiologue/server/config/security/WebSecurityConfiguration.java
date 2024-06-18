@@ -1,10 +1,7 @@
-package org.idiologue.server.config;
+package org.idiologue.server.config.security;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.idiologue.server.security.BearerTokenAuthenticationConverter;
-import org.idiologue.server.security.BearerTokenAuthenticationManager;
-import org.idiologue.server.security.DefaultSecurityContextRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
