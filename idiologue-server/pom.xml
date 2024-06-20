@@ -14,6 +14,7 @@
     <properties>
         <spring.boot.version>3.2.6</spring.boot.version>
         <spring.hateoas.version>2.3.0</spring.hateoas.version>
+        <openapi.version>2.5.0</openapi.version>
 
         <apache.tika.version>2.9.2</apache.tika.version>
         <janusgraph.version>1.0.0-20231016-190430.26ed54f</janusgraph.version>
@@ -85,6 +86,23 @@
                 <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-api</artifactId>
+            <version>${openapi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-webflux</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-autoconfigure</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

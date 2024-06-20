@@ -6,6 +6,11 @@ spring:
     multipart:
       resolve-lazily: true
 
+springdoc:
+  enable-hateoas: false
+  show-actuator: true
+  packages-to-scan: org.idiologue
+
 binary:
   storage:
     strategy: block

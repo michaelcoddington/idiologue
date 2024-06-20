@@ -76,7 +76,7 @@ public class EntityController {
             for (Map.Entry<String, Metadata> entry: entity.getProperties().entrySet()) {
                 String key = entry.getKey();
                 Metadata value = entry.getValue();
-                traversal = traversal.property(key, value.getVablue());
+                traversal = traversal.property(key, value.getValue());
             }
             traversal.next();
             g.tx().commit();

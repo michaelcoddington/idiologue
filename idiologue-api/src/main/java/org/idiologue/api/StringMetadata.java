@@ -8,7 +8,7 @@ public class StringMetadata extends Metadata<String> {
     private String value;
 
     @Override
-    public String getVablue() {
+    public String getValue() {
         return value;
     }
 

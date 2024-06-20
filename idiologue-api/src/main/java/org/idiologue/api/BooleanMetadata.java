@@ -8,7 +8,7 @@ public class BooleanMetadata extends Metadata<Boolean> {
     private Boolean value;
 
     @Override
-    public Boolean getVablue() {
+    public Boolean getValue() {
         return value;
     }
 
