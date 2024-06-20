@@ -1,5 +1,7 @@
 package org.idiologue.server.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
@@ -28,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
+@Tag(name = "Entity Controller", description = "Operations on entities")
 @RequestMapping("/api/v1/entity")
 public class EntityController {
 
@@ -45,6 +48,7 @@ public class EntityController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Retrieves a specific entity by ID")
     Map<String, Object> getEntity(@PathVariable("id") Long id) {
         Map<String, Object> projection = g.V(id).
                 project("id", "type", "properties")
@@ -57,6 +61,7 @@ public class EntityController {
     }
 
     @GetMapping
+    @Operation(summary = "Retrieves all entities")
     Flux<Map<String, Object>> getEntities() {
         Iterator<Map<String, Object>> projectionIterator = g.V().
                 project("id", "type", "properties")

@@ -8,8 +8,11 @@ spring:
 
 springdoc:
   enable-hateoas: false
-  show-actuator: true
-  packages-to-scan: org.idiologue
+  swagger-ui:
+    operationsSorter: method
+  # show-actuator: true
+  # packages-to-scan: org.idiologue
+  # pre-loading-enabled: true
 
 binary:
   storage:

@@ -93,7 +93,7 @@
         <!-- OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webflux-api</artifactId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
             <version>${openapi.version}</version>
             <exclusions>
                 <exclusion>
@@ -106,6 +106,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+
+        <!-- end OpenAPI -->
+
 
         <!-- Tika for image metadata extraction -->
         <dependency>
