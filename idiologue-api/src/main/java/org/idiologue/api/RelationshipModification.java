@@ -4,11 +4,6 @@ import java.util.StringJoiner;
 
 public class RelationshipModification {
 
-    public enum Action {
-        CREATE,
-        DELETE
-    }
-
     private Action action;
 
     public Action getAction() {

@@ -2,6 +2,8 @@ package org.idiologue.api;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import java.util.StringJoiner;
+
 @JsonTypeName(TypeConstants.STRING)
 public class StringMetadata extends Metadata<String> {
 
@@ -17,4 +19,10 @@ public class StringMetadata extends Metadata<String> {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", StringMetadata.class.getSimpleName() + "[", "]")
+                .add("value='" + value + "'")
+                .toString();
+    }
 }

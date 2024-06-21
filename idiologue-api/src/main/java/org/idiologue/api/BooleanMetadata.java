@@ -2,6 +2,8 @@ package org.idiologue.api;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import java.util.StringJoiner;
+
 @JsonTypeName(TypeConstants.STRING)
 public class BooleanMetadata extends Metadata<Boolean> {
 
@@ -15,6 +17,13 @@ public class BooleanMetadata extends Metadata<Boolean> {
     @Override
     public void setValue(Boolean value) {
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", BooleanMetadata.class.getSimpleName() + "[", "]")
+                .add("value=" + value)
+                .toString();
     }
 
 }

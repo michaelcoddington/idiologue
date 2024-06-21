@@ -9,20 +9,20 @@ import java.util.StringJoiner;
  */
 public class RepositoryModificationRequest {
 
-    private List<RelationshipModification> relationships;
+    private List<EntityModification> entities;
 
-    public List<RelationshipModification> getRelationships() {
-        return relationships;
+    public List<EntityModification> getEntities() {
+        return entities;
     }
 
-    public void setRelationships(List<RelationshipModification> relationships) {
-        this.relationships = relationships;
+    public void setEntities(List<EntityModification> entities) {
+        this.entities = entities;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", RepositoryModificationRequest.class.getSimpleName() + "[", "]")
-                .add("relationships=" + relationships)
+                .add("entities=" + entities)
                 .toString();
     }
 }
