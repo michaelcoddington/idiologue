@@ -21,9 +21,6 @@ public class WebSecurityConfiguration {
     private static final Logger LOG = LogManager.getLogger(WebSecurityConfiguration.class);
 
     @Autowired
-    private DefaultSecurityContextRepository contextRepository;
-
-    @Autowired
     private BearerTokenAuthenticationManager tokenAuthenticationManager;
 
     @Autowired

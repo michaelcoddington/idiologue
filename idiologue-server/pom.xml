@@ -12,15 +12,12 @@
     <artifactId>idiologue-server</artifactId>
 
     <properties>
-        <spring.boot.version>3.2.6</spring.boot.version>
         <spring.hateoas.version>2.3.0</spring.hateoas.version>
         <openapi.version>2.5.0</openapi.version>
 
         <apache.tika.version>2.9.2</apache.tika.version>
         <janusgraph.version>1.0.0-20231016-190430.26ed54f</janusgraph.version>
         <tinkerpop.version>3.7.2</tinkerpop.version>
-
-        <junit.version>5.8.2</junit.version>
     </properties>
 
     <dependencies>
@@ -127,13 +124,7 @@
             <version>${apache.tika.version}</version>
         </dependency>
 
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
+
 
 
     </dependencies>

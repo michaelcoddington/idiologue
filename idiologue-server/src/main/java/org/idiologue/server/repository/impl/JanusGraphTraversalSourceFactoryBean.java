@@ -1,7 +1,5 @@
 package org.idiologue.server.repository.impl;
 
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.idiologue.server.repository.GraphTraversalSourceFactoryBean;
 import org.springframework.stereotype.Component;
@@ -26,15 +24,20 @@ public class JanusGraphTraversalSourceFactoryBean implements GraphTraversalSourc
 
          */
 
+        /*
         Configuration config = new PropertiesConfiguration();
         config.setProperty("gremlin.remote.remoteConnectionClass", "org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection");
         config.setProperty("gremlin.remote.driver.sourceName", "g");
         config.setProperty("clusterConfiguration.hosts", "localhost");
         config.setProperty("clusterConfiguration.port", 8182);
         config.setProperty("clusterConfiguration.serializer.className", "org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1");
-        config.setProperty("clsuterConfiguration.serializer.config.ioRegistries", "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
+        config.setProperty("clusterConfiguration.serializer.config.ioRegistries", "org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry");
 
         return traversal().withRemote(config);
+
+         */
+
+        return traversal().withRemote("conf/remote-graph.properties");
     }
 
 }

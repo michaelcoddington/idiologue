@@ -28,9 +28,11 @@ public class BearerTokenAuthenticationManager implements ReactiveAuthenticationM
     public Mono<Authentication> authenticate(Authentication authentication) {
         LOG.info("Checking authentication on {}", authentication);
         String token = authentication.getCredentials().toString();
-        if (securityService.isValidAccessToken(token)) {
-            LOG.info("Token {} is valid", token);
-            UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(token, token, List.of(new SimpleGrantedAuthority("USER")));
+        String username = securityService.userForAccessToken(token);
+        if (username != null) {
+            LOG.info("Token {} is valid for user {}", token, username);
+            UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority("USER")));
+            LOG.info("Returning authentication {}", result);
             return Mono.just(result);
         } else {
             LOG.warn("Token {} is invalid", token);
