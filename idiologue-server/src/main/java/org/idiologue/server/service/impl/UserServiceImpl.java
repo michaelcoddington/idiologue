@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class DefaultUserService implements UserService, ApplicationListener<ContextRefreshedEvent> {
+public class UserServiceImpl implements UserService, ApplicationListener<ContextRefreshedEvent> {
 
-    private static final Logger LOG = LogManager.getLogger(DefaultUserService.class);
+    private static final Logger LOG = LogManager.getLogger(UserServiceImpl.class);
 
     private GraphTraversalSource g;
 
-    DefaultUserService(GraphTraversalSource source) {
+    UserServiceImpl(GraphTraversalSource source) {
         this.g = source;
     }
 

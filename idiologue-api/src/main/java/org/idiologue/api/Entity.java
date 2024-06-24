@@ -6,7 +6,7 @@ public class Entity {
 
     private String type;
 
-    private Map<String, Metadata> properties;
+    private Map<String, ReadableMetadata> properties;
 
     public String getType() {
         return type;
@@ -16,11 +16,11 @@ public class Entity {
         this.type = type;
     }
 
-    public Map<String, Metadata> getProperties() {
+    public Map<String, ReadableMetadata> getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, Metadata> properties) {
+    public void setProperties(Map<String, ReadableMetadata> properties) {
         this.properties = properties;
     }
 

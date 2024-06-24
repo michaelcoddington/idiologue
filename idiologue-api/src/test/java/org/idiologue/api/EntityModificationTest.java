@@ -18,15 +18,17 @@ public class EntityModificationTest {
 
         ObjectMapper mapper = new ObjectMapper();
 
+        Map<String, WritableMetadata> props = Map.of("propA", new StringMetadata("valueA"), "propB", new BooleanMetadata(false));
+
         var create = new EntityCreateModification();
         create.setType("test:node");
-        create.setProperties(Map.of("propA", new StringMetadata("valueA")));
+        create.setProperties(props);
         var createString = mapper.writeValueAsString(create);
         var createBack = mapper.readValue(createString, EntityModification.class);
         assertEquals(create, createBack);
 
         var update = new EntityUpdateModification();
-        update.setProperties(Map.of("propA", new StringMetadata("valueA")));
+        update.setProperties(props);
         var updateString = mapper.writeValueAsString(update);
         var updateBack = mapper.readValue(updateString, EntityModification.class);
         assertEquals(update, updateBack);

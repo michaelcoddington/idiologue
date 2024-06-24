@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 @JsonTypeName(TypeConstants.STRING)
-public class BooleanMetadata extends Metadata<Boolean> {
+public class BooleanMetadata extends Metadata<Boolean> implements ReadableMetadata, WritableMetadata {
 
     private Boolean value;
 

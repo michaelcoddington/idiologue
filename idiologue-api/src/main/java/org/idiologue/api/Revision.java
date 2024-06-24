@@ -7,7 +7,7 @@ import java.util.StringJoiner;
  * A request to modify the repository in some way, creating or removing some combination
  * of entities and relationships.
  */
-public class RepositoryModificationRequest {
+public class Revision {
 
     private List<EntityModification> entities;
 
@@ -21,7 +21,7 @@ public class RepositoryModificationRequest {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", RepositoryModificationRequest.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", Revision.class.getSimpleName() + "[", "]")
                 .add("entities=" + entities)
                 .toString();
     }

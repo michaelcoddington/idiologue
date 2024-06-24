@@ -11,7 +11,7 @@ public class EntityCreateModification extends EntityModification {
 
     private String type;
 
-    private Map<String, Metadata> properties;
+    private Map<String, WritableMetadata> properties;
 
     public String getType() {
         return type;
@@ -21,11 +21,11 @@ public class EntityCreateModification extends EntityModification {
         this.type = type;
     }
 
-    public Map<String, Metadata> getProperties() {
+    public Map<String, WritableMetadata> getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, Metadata> properties) {
+    public void setProperties(Map<String, WritableMetadata> properties) {
         this.properties = properties;
     }
 

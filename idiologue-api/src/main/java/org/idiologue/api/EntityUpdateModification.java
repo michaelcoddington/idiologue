@@ -10,7 +10,7 @@ public class EntityUpdateModification extends EntityModification {
 
     private Long id;
 
-    private Map<String, Metadata> properties;
+    private Map<String, WritableMetadata> properties;
 
     public Long getId() {
         return id;
@@ -20,11 +20,11 @@ public class EntityUpdateModification extends EntityModification {
         this.id = id;
     }
 
-    public Map<String, Metadata> getProperties() {
+    public Map<String, WritableMetadata> getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, Metadata> properties) {
+    public void setProperties(Map<String, WritableMetadata> properties) {
         this.properties = properties;
     }
 
